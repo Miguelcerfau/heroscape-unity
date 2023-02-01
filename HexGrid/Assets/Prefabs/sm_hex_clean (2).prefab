@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3244160879522583798}
   - component: {fileID: 784018209458708540}
   - component: {fileID: -8705012744782739354}
+  - component: {fileID: 8709943143074600051}
   m_Layer: 6
   m_Name: sm_hex_clean (2)
   m_TagString: Untagged
@@ -98,3 +99,23 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 2534964839176971238, guid: df2bd39d239f0d44495570f52c3323c6, type: 3}
+--- !u!95 &8709943143074600051
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288478199106683369}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8b78eefbc2c8b8f4ab45757123eba222, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0

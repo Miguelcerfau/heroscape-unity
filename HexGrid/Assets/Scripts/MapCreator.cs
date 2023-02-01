@@ -39,12 +39,16 @@ public class MapCreator : MonoBehaviour
             if (posLastSelectedTile != posActualTile)
             {
                 GameObject lastSelectedTile = grid.GetTile(posLastSelectedTile);
-                if(lastSelectedTile.transform.position.y != 0) lastSelectedTile.transform.Translate(new Vector3(0, -1, 0));
+                lastSelectedTile.GetComponent<Animator>().SetBool("isSelected", false);
                 grid.SelectTile(posActualTile);
-                grid.GetTile(posActualTile).transform.Translate(new Vector3(0, 1, 0));
+                grid.GetTile(posActualTile).GetComponent<Animator>().SetBool("isSelected", true);
             }
             Debug.Log(hit.transform.position);
         }
+    }
+
+    public void changeMode(bool active)
+    {
         
     }
 }
