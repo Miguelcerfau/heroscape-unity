@@ -6,13 +6,19 @@ public class MapCreator : MonoBehaviour
 {
     [SerializeField]
     private GameObject hexPrefab;
-
-    private HexGrid grid;
-    
+    [SerializeField]
+    private Material normalMaterial;
+    [SerializeField]
+    private Material highlightMaterial;
     [SerializeField]
     private GameObject gridContainer;
+    [SerializeField]
 
+
+    private HexGrid grid;
     public LayerMask mask;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -30,21 +36,31 @@ public class MapCreator : MonoBehaviour
         mousePos = Camera.main.ScreenToWorldPoint(mousePos);
         Debug.DrawRay(Camera.main.transform.position, mousePos - Camera.main.transform.position, Color.blue);
 
-        Vector3 posLastSelectedTile = grid.GetPosSelectedTile();
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if(Physics.Raycast(ray, out hit, 100, mask))
         {
-            Vector3 posActualTile = grid.WorldToGridCoords(hit.transform.position);
-            if (posLastSelectedTile != posActualTile)
-            {
-                GameObject lastSelectedTile = grid.GetTile(posLastSelectedTile);
-                lastSelectedTile.GetComponent<Animator>().SetBool("isSelected", false);
-                grid.SelectTile(posActualTile);
-                grid.GetTile(posActualTile).GetComponent<Animator>().SetBool("isSelected", true);
-            }
-            Debug.Log(hit.transform.position);
+            selectTile(hit);
+            if(Input.GetMouseButtonDown(0)) grid.insertTile(hexPrefab, gridContainer);
         }
+    }
+
+
+    private void selectTile(RaycastHit hit)
+    {
+        Vector3 posLastSelectedTile = grid.GetPosSelectedTile();
+
+        Vector3 posActualTile = grid.WorldToGridCoords(hit.transform.position);
+
+        if (posLastSelectedTile != posActualTile)
+        {
+            GameObject lastSelectedTile = grid.GetTile(posLastSelectedTile);
+            lastSelectedTile.GetComponent<MeshRenderer>().material = normalMaterial;
+            Debug.Log(lastSelectedTile.transform.position);
+            grid.SelectTile(posActualTile);
+            grid.GetTile(posActualTile).GetComponent<MeshRenderer>().material = highlightMaterial;
+        }
+        //Debug.Log(hit.transform.position);
     }
 
     public void changeMode(bool active)

@@ -14,7 +14,7 @@ public class HexGrid
     private float tileSizeZ;
     private float tileSizeX;
     private Vector3 gridOrigin;
-    private GameObject[,,] grid;
+    private GameObject[,,] grid; //x,z,y (left, front, up)
     private Vector3 selectedTile;
 
     public HexGrid(int x, int z, int height, Vector3 gridOrigin, GameObject prefabHex, GameObject gridContainer)
@@ -63,11 +63,11 @@ public class HexGrid
 
     public GameObject GetTile(Vector3 positionTile)
     {
-        return grid[(int)positionTile.x,(int)positionTile.y,(int)positionTile.z];
+        return grid[Mathf.RoundToInt(positionTile.x), Mathf.RoundToInt(positionTile.z), Mathf.RoundToInt(positionTile.y)];
     }
 
 
-    public Vector2 WorldToGridCoords(Vector3 positionWorldSpace)
+    public Vector3 WorldToGridCoords(Vector3 positionWorldSpace)
     {
         //y means the second component which is Z because is a grid
         int aproxX = Mathf.RoundToInt((positionWorldSpace.x - gridOrigin.x) / tileSizeX);
@@ -98,8 +98,22 @@ public class HexGrid
                 correctTile = n;
             }
         }
-        return new Vector2(correctTile.x, correctTile.z);
+        return new Vector3(correctTile.x, positionWorldSpace.y, correctTile.z);
     }
+
+    public void insertTile(GameObject prefabHex, GameObject gridContainer)
+    {
+        int y = Mathf.RoundToInt(selectedTile.y + 1);
+        if(y < height) {
+            float offset = 1f;
+            int x = Mathf.RoundToInt(selectedTile.x);
+            int z = Mathf.RoundToInt(selectedTile.z);
+            grid[x, z, y] = GameObject.Instantiate(prefabHex, GridToWorldCoords(x, selectedTile.y + offset, z), Quaternion.identity, gridContainer.transform);
+        }
+    }
+
+
+
 
 
 }
