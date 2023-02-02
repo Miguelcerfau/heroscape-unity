@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class HexGrid
 {
-
-    [SerializeField]
-    private GameObject tile;
     private int width;
     private int length;
     private int height;
@@ -16,8 +13,11 @@ public class HexGrid
     private Vector3 gridOrigin;
     private GameObject[,,] grid; //x,z,y (left, front, up)
     private Vector3 selectedTile;
+    private LayerMask mask;
+    private Material normalMaterial;
+    private Material highlightMaterial;
 
-    public HexGrid(int x, int z, int height, Vector3 gridOrigin, GameObject prefabHex, GameObject gridContainer)
+    public HexGrid(int x, int z, int height, Vector3 gridOrigin, GameObject prefabHex, GameObject gridContainer, LayerMask mask, Material normalMaterial, Material highlightMaterial)
     {
         this.width = x;
         this.length = z;
@@ -26,6 +26,9 @@ public class HexGrid
         this.tileSizeZ = 2f;
         this.tileSizeX = 2 * Mathf.Sin(60 * Mathf.Deg2Rad); //Ratio between Hexagon width and height is 1:1.1547005
         this.selectedTile = gridOrigin;
+        this.mask = mask;
+        this.normalMaterial = normalMaterial;
+        this.highlightMaterial = highlightMaterial;
 
         grid = new GameObject[x, z, height];
 
@@ -55,9 +58,31 @@ public class HexGrid
         return selectedTile;
     }
 
-    public void SelectTile(Vector3 gridPosition)
+    public void SelectTile()
     {
-        selectedTile = gridPosition;
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = 100f;
+        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+        Debug.DrawRay(Camera.main.transform.position, mousePos - Camera.main.transform.position, Color.blue);
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 100, mask))
+        {
+            Vector3 posLastSelectedTile = GetPosSelectedTile();
+
+            Vector3 posActualTile = WorldToGridCoords(hit.transform.position);
+
+            if (posLastSelectedTile != posActualTile)
+            {
+                GameObject lastSelectedTile = GetTile(posLastSelectedTile);
+                lastSelectedTile.GetComponent<MeshRenderer>().material = normalMaterial;
+                Debug.Log(lastSelectedTile.transform.position);
+                selectedTile = posActualTile;
+            }
+            GetTile(posActualTile).GetComponent<MeshRenderer>().material = highlightMaterial;
+            //Debug.Log(hit.transform.position);
+        }
     }
 
 
@@ -112,8 +137,17 @@ public class HexGrid
         }
     }
 
-
-
-
-
+    public void deleteTile()
+    {
+        int y = Mathf.RoundToInt(selectedTile.y);
+        if (y > 0)
+        {
+            int x = Mathf.RoundToInt(selectedTile.x);
+            int z = Mathf.RoundToInt(selectedTile.z);
+            GameObject.Destroy(grid[x, z, y]);
+            grid[x, z, y] = null;
+            selectedTile = new Vector3(selectedTile.x, selectedTile.y - 1, selectedTile.z);
+            GetTile(selectedTile).GetComponent<MeshRenderer>().material = highlightMaterial;
+        }
+    }
 }
