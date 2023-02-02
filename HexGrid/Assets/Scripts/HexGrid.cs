@@ -145,7 +145,7 @@ public class HexGrid
             int z = Mathf.RoundToInt(selectedTile.z);
             GameObject.Destroy(grid[x, z, y]);
             grid[x, z, y] = null;
-            selectedTile = new Vector3(selectedTile.x, selectedTile.y - 1, selectedTile.z);
+            selectedTile = new Vector3(x, 0, z);
             GetTile(selectedTile).GetComponent<MeshRenderer>().material = highlightMaterial;
         }
     }
