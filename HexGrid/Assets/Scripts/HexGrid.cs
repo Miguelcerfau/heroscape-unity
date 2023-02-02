@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class HexGrid
 {
     private int width;
@@ -133,7 +132,7 @@ public class HexGrid
             float offset = 1f;
             int x = Mathf.RoundToInt(selectedTile.x);
             int z = Mathf.RoundToInt(selectedTile.z);
-            grid[x, z, y] = GameObject.Instantiate(prefabHex, GridToWorldCoords(x, selectedTile.y + offset, z), Quaternion.identity, gridContainer.transform);
+            if(grid[x, z, y] == null) grid[x, z, y] = GameObject.Instantiate(prefabHex, GridToWorldCoords(x, selectedTile.y + offset, z), Quaternion.identity, gridContainer.transform);
         }
     }
 
