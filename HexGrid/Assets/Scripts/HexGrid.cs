@@ -28,7 +28,7 @@ public class HexGrid
         this.gridOrigin = gridOrigin;
         this.tileSizeZ = 2f;
         this.tileSizeX = 2 * Mathf.Sin(60 * Mathf.Deg2Rad); //Ratio between Hexagon width and height is 1:1.1547005
-        this.selectedTile = gridOrigin;
+        this.selectedTile = new Vector3(-1,-1,-1);
         this.mask = mask;
         this.gridTileMat = gridTileMat;
         this.highlightMat = highlightMat;
@@ -83,9 +83,13 @@ public class HexGrid
 
             if (posLastSelectedTile != posActualTile)
             {
-                GameObject lastSelectedTile = GetTile(posLastSelectedTile).getGameObject();
-                lastSelectedTile.GetComponent<MeshRenderer>().material = GetTile(posLastSelectedTile).getMaterial();
-                Debug.Log(lastSelectedTile.transform.position);
+                if(posLastSelectedTile != new Vector3(-1, -1, -1))
+                {
+                    GameObject lastSelectedTile = GetTile(posLastSelectedTile).getGameObject();
+                    lastSelectedTile.GetComponent<MeshRenderer>().material = GetTile(posLastSelectedTile).getMaterial();
+                }
+                    
+                //Debug.Log(lastSelectedTile.transform.position);
                 selectedTile = posActualTile;
             }
             GetTile(posActualTile).getGameObject().GetComponent<MeshRenderer>().material = highlightMat;
@@ -136,14 +140,18 @@ public class HexGrid
 
     public void insertTile(int typeOfTile)
     {
-        int y = Mathf.RoundToInt(selectedTile.y + 1); //this 1 means to insert the tile above the selectedTile
-        if(y < height) {
-            int x = Mathf.RoundToInt(selectedTile.x);
-            int z = Mathf.RoundToInt(selectedTile.z);
-            if(grid[x, z, y] == null)
+        if(selectedTile != new Vector3(-1, -1, -1))
+        {
+            int y = Mathf.RoundToInt(selectedTile.y + 1); //this 1 means to insert the tile above the selectedTile
+            if (y < height)
             {
-                addTileToGrid(typeOfTile, x, y, z);
-            } 
+                int x = Mathf.RoundToInt(selectedTile.x);
+                int z = Mathf.RoundToInt(selectedTile.z);
+                if (grid[x, z, y] == null)
+                {
+                    addTileToGrid(typeOfTile, x, y, z);
+                }
+            }
         }
     }
 
