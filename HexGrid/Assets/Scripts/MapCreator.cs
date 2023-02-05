@@ -39,8 +39,8 @@ public class MapCreator : MonoBehaviour
     void Update()
     {
         grid.SelectTile();
-        if(Input.GetMouseButtonDown(0)) grid.insertTile(typeOfSelectedTile);
-        if(Input.GetMouseButtonDown(1)) grid.deleteTile();
+        if(Input.GetMouseButton(0)) grid.insertTile(typeOfSelectedTile);
+        if(Input.GetMouseButton(1)) grid.deleteTile();
         if(Input.GetKeyDown(KeyCode.Alpha1)) typeOfSelectedTile = 1;
         if(Input.GetKeyDown(KeyCode.Alpha2)) typeOfSelectedTile = 2;
     }

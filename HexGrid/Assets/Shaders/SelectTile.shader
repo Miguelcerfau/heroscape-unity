@@ -46,10 +46,10 @@ Shader "Custom/SelectTile"
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex);
             if(_Selected == 1){
-                c = c * lerp(_Color, _Color1, 0.7);
+                c *= lerp(_Color, _Color1, 0.7);
             }
             else{
-                c = c * _Color;
+                c *= _Color;
             }
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables

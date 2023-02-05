@@ -659,9 +659,9 @@ MonoBehaviour:
   waterTile: {fileID: 1151199096502529920, guid: 3f25e1ea9bd89f24ba7cf8b4844b12af, type: 3}
   grassTile: {fileID: 4408488860139143395, guid: ba162a72d43bda948953867c12753c4b, type: 3}
   gridContainer: {fileID: 327377282}
-  x: 20
-  y: 20
-  z: 4
+  x: 40
+  y: 40
+  z: 10
   mask:
     serializedVersion: 2
     m_Bits: 64
