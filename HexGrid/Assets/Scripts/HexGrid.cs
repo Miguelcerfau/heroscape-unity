@@ -116,13 +116,10 @@ public class HexGrid
         }
     }
 
-
-
     public Tile GetTile(Vector3 positionTile)
     {
         return grid[Mathf.RoundToInt(positionTile.x)][Mathf.RoundToInt(positionTile.z)][Mathf.RoundToInt(positionTile.y)];
     }
-
 
     public Vector3 WorldToGridCoords(Vector3 positionWorldSpace)
     {
@@ -187,17 +184,27 @@ public class HexGrid
         }
     }
 
-    private void addTileToGrid(int typeOfTile, int x, int y, int z)
+    private void addTileToGrid(int typeOfTile, int x, int y, int z) //x,y,z coords of the new tile, selectedTile coords of tile below
     {
-        float centerToTop = GetTile(selectedTile).getGameObject().GetComponent<MeshRenderer>().bounds.max.y - gridOrigin.y;
+        Vector3 worldCoords;
+        float centerToTop;
         if (typeOfTile == 1) //waterTile
         {
-            Vector3 worldCoords = GridToWorldCoords(x, centerToTop + NORMAL75_HEX_SIZE_Y, z);
+            if(GetTile(selectedTile).GetType() == typeof(WaterTile))
+            {
+                grid[x][z][y-1].deleteInstance();
+                centerToTop = GetTile(new Vector3(selectedTile.x, selectedTile.y - 1, selectedTile.z)).getGameObject().GetComponent<MeshRenderer>().bounds.max.y - gridOrigin.y;
+                worldCoords = GridToWorldCoords(x, centerToTop + NORMAL_HEX_SIZE_Y, z);
+                grid[x][z][y-1] = new WaterTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(waterTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
+            }
+            centerToTop = GetTile(new Vector3(selectedTile.x, selectedTile.y, selectedTile.z)).getGameObject().GetComponent<MeshRenderer>().bounds.max.y - gridOrigin.y;
+            worldCoords = GridToWorldCoords(x, centerToTop + NORMAL75_HEX_SIZE_Y, z);
             grid[x][z][y] = new WaterTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(waterTile75Prefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
         }
         else if(typeOfTile == 2) //grassTile
         {
-            Vector3 worldCoords = GridToWorldCoords(x, centerToTop + NORMAL_HEX_SIZE_Y, z);
+            centerToTop = GetTile(selectedTile).getGameObject().GetComponent<MeshRenderer>().bounds.max.y - gridOrigin.y;
+            worldCoords = GridToWorldCoords(x, centerToTop + NORMAL_HEX_SIZE_Y, z);
             grid[x][z][y] = new GrassTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(grassTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
         }
     }
@@ -210,6 +217,14 @@ public class HexGrid
             int x = Mathf.RoundToInt(selectedTile.x);
             int z = Mathf.RoundToInt(selectedTile.z);
 
+            if(grid[x][z][y].GetType() == typeof(WaterTile) && grid[x][z][y-1].GetType() == typeof(WaterTile))
+            {
+                grid[x][z][y - 1].deleteInstance();
+                float centerToTop = GetTile(new Vector3(selectedTile.x, selectedTile.y-2, selectedTile.z)).getGameObject().GetComponent<MeshRenderer>().bounds.max.y - gridOrigin.y;
+                Vector3 worldCoords = GridToWorldCoords(x, centerToTop + NORMAL75_HEX_SIZE_Y, z);
+                grid[x][z][y-1] = new WaterTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(waterTile75Prefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
+            }
+            else { }
             grid[x][z][y].deleteInstance();
             grid[x][z][y] = null;
             selectedTile = new Vector3(x, 0, z);
