@@ -10,7 +10,7 @@ public class HexGrid
     private float tileSizeZ;
     private float tileSizeX;
     private Vector3 gridOrigin;
-    private Tile[,,] grid; //x,z,y (left, front, up)
+    private Tile[][][] grid;
     private Vector3 selectedTile;
     private LayerMask mask;
     private GameObject gridContainer;
@@ -22,8 +22,8 @@ public class HexGrid
 
 
     //CONSTANTS
-    private const float NORMAL_HEX_SIZE_Y = 1.58f;
-    private const float NORMAL75_HEX_SIZE_Y = 1.455f;
+    private const float NORMAL_HEX_SIZE_Y = 0.5f;
+    private const float NORMAL75_HEX_SIZE_Y = 0.375f;
 
 
     public HexGrid(int x, int z, int height, Vector3 gridOrigin, GameObject gridTilePrefab, GameObject waterTilePrefab, GameObject grassTilePrefab, GameObject gridContainer, LayerMask mask)
@@ -41,16 +41,19 @@ public class HexGrid
         this.waterTilePrefab = waterTilePrefab;
         this.grassTilePrefab = grassTilePrefab;
 
-        grid = new Tile[x, z, height];
-
-        for (int i = 0; i < x; i++)
+        grid = new Tile[x][][];
+        for(int i = 0; i < x; ++i)
         {
-            for (int j = 0; j < z; j++)
+            Tile[][] list1 = new Tile[z][];
+            for(int j = 0; j < z; ++j)
             {
+                Tile[] list2 = new Tile[height];
                 Vector3 worldCoords = GridToWorldCoords(i, 0, j);
-                grid[i, j, 0] = new GridTile(worldCoords, new Vector3Int(i, j, 0), GameObject.Instantiate(gridTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
+                list2.SetValue(new GridTile(worldCoords, new Vector3Int(i, j, 0), GameObject.Instantiate(gridTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer), 0);
+                list1.SetValue(list2, j);
             }
-        }
+            grid.SetValue(list1, i);
+        }            
     }
 
     /**
@@ -115,7 +118,7 @@ public class HexGrid
 
     public Tile GetTile(Vector3 positionTile)
     {
-        return grid[Mathf.RoundToInt(positionTile.x), Mathf.RoundToInt(positionTile.z), Mathf.RoundToInt(positionTile.y)];
+        return grid[Mathf.RoundToInt(positionTile.x)][Mathf.RoundToInt(positionTile.z)][Mathf.RoundToInt(positionTile.y)];
     }
 
 
@@ -150,8 +153,20 @@ public class HexGrid
                 correctTile = n;
             }
         }
-        return new Vector3(correctTile.x, positionWorldSpace.y, correctTile.z);
+        return new Vector3(correctTile.x, heightOfXZ(new Vector2(correctTile.x, correctTile.z)), correctTile.z);
     }
+
+    private float heightOfXZ(Vector2 posXZ)
+    {
+        float res = 0f;
+        foreach (Tile x in grid[Mathf.RoundToInt(posXZ.x)][Mathf.RoundToInt(posXZ.y)])
+        {
+            if (x != null) res += 1f;
+            else break;
+        }
+        return res - 1; //-1 because there's always a tile (gridTile)
+    }
+
 
     public void insertTile(int typeOfTile)
     {
@@ -162,7 +177,7 @@ public class HexGrid
             {
                 int x = Mathf.RoundToInt(selectedTile.x);
                 int z = Mathf.RoundToInt(selectedTile.z);
-                if (grid[x, z, y] == null)
+                if (grid[x][z][y] == null)
                 {
                     addTileToGrid(typeOfTile, x, y, z);
                 }
@@ -172,16 +187,16 @@ public class HexGrid
 
     private void addTileToGrid(int typeOfTile, int x, int y, int z)
     {
-
-        if(typeOfTile == 1) //waterTile
+        float centerToTop = GetTile(selectedTile).getGameObject().GetComponent<MeshRenderer>().bounds.max.y - gridOrigin.y;
+        if (typeOfTile == 1) //waterTile
         {
-            Vector3 worldCoords = GridToWorldCoords(x, selectedTile.y + 1f, z);
-            grid[x, z, y] = new WaterTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(waterTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
+            Vector3 worldCoords = GridToWorldCoords(x, centerToTop + NORMAL75_HEX_SIZE_Y, z);
+            grid[x][z][y] = new WaterTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(waterTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
         }
         else if(typeOfTile == 2) //grassTile
         {
-            Vector3 worldCoords = GridToWorldCoords(x, selectedTile.y + 1f, z);
-            grid[x, z, y] = new GrassTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(grassTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
+            Vector3 worldCoords = GridToWorldCoords(x, centerToTop + NORMAL_HEX_SIZE_Y, z);
+            grid[x][z][y] = new GrassTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(grassTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
         }
     }
 
@@ -192,9 +207,9 @@ public class HexGrid
         {
             int x = Mathf.RoundToInt(selectedTile.x);
             int z = Mathf.RoundToInt(selectedTile.z);
- 
-            grid[x, z, y].deleteInstance();
-            grid[x, z, y] = null;
+
+            grid[x][z][y].deleteInstance();
+            grid[x][z][y] = null;
             selectedTile = new Vector3(x, 0, z);
             GetTile(selectedTile).getGameObject().GetComponent<MeshRenderer>().material.SetInteger("_Selected", 1);
         }
