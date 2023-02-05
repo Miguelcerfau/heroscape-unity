@@ -13,14 +13,20 @@ public class HexGrid
     private Tile[,,] grid; //x,z,y (left, front, up)
     private Vector3 selectedTile;
     private LayerMask mask;
-    private Material gridTileMat;
-    private Material highlightMat;
-    private GameObject gridTilePrefab;
     private GameObject gridContainer;
+    
+    
+    private GameObject gridTilePrefab;
     private GameObject waterTilePrefab;
-    private Material waterTileMat;
+    private GameObject grassTilePrefab;
 
-    public HexGrid(int x, int z, int height, Vector3 gridOrigin, GameObject gridTile, GameObject waterTile, GameObject gridContainer, LayerMask mask, Material gridTileMat, Material highlightMat, Material waterTileMat)
+
+    //CONSTANTS
+    private const float NORMAL_HEX_SIZE_Y = 1.58f;
+    private const float NORMAL75_HEX_SIZE_Y = 1.455f;
+
+
+    public HexGrid(int x, int z, int height, Vector3 gridOrigin, GameObject gridTilePrefab, GameObject waterTilePrefab, GameObject grassTilePrefab, GameObject gridContainer, LayerMask mask)
     {
         this.width = x;
         this.length = z;
@@ -30,12 +36,10 @@ public class HexGrid
         this.tileSizeX = 2 * Mathf.Sin(60 * Mathf.Deg2Rad); //Ratio between Hexagon width and height is 1:1.1547005
         this.selectedTile = new Vector3(-1,-1,-1);
         this.mask = mask;
-        this.gridTileMat = gridTileMat;
-        this.highlightMat = highlightMat;
-        this.gridTilePrefab = gridTile;
+        this.gridTilePrefab = gridTilePrefab;
         this.gridContainer = gridContainer;
-        this.waterTilePrefab = waterTile;
-        this.waterTileMat = waterTileMat;
+        this.waterTilePrefab = waterTilePrefab;
+        this.grassTilePrefab = grassTilePrefab;
 
         grid = new Tile[x, z, height];
 
@@ -44,7 +48,7 @@ public class HexGrid
             for (int j = 0; j < z; j++)
             {
                 Vector3 worldCoords = GridToWorldCoords(i, 0, j);
-                grid[i, j, 0] = new GridTile(worldCoords, new Vector3Int(i, j, 0), GameObject.Instantiate(gridTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer, gridTileMat);
+                grid[i, j, 0] = new GridTile(worldCoords, new Vector3Int(i, j, 0), GameObject.Instantiate(gridTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
             }
         }
     }
@@ -86,16 +90,27 @@ public class HexGrid
                 if(posLastSelectedTile != new Vector3(-1, -1, -1))
                 {
                     GameObject lastSelectedTile = GetTile(posLastSelectedTile).getGameObject();
-                    lastSelectedTile.GetComponent<MeshRenderer>().material = GetTile(posLastSelectedTile).getMaterial();
+                    lastSelectedTile.GetComponent<MeshRenderer>().material.SetInteger("_Selected", 0);
                 }
                     
                 //Debug.Log(lastSelectedTile.transform.position);
                 selectedTile = posActualTile;
             }
-            GetTile(posActualTile).getGameObject().GetComponent<MeshRenderer>().material = highlightMat;
+            GetTile(posActualTile).getGameObject().GetComponent<MeshRenderer>().material.SetInteger("_Selected", 1);
             //Debug.Log(hit.transform.position);
         }
+        else
+        {
+            if (selectedTile != new Vector3(-1, -1, -1))
+            {
+                GameObject lastSelectedTile = GetTile(selectedTile).getGameObject();
+                lastSelectedTile.GetComponent<MeshRenderer>().material.SetInteger("_Selected", 0);
+            }
+            selectedTile = new Vector3(-1, -1, -1);
+
+        }
     }
+
 
 
     public Tile GetTile(Vector3 positionTile)
@@ -157,15 +172,16 @@ public class HexGrid
 
     private void addTileToGrid(int typeOfTile, int x, int y, int z)
     {
-        if(typeOfTile == 0) //gridTile
+
+        if(typeOfTile == 1) //waterTile
         {
             Vector3 worldCoords = GridToWorldCoords(x, selectedTile.y + 1f, z);
-            grid[x, z, y] = new GridTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(gridTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer, gridTileMat);
+            grid[x, z, y] = new WaterTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(waterTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
         }
-        else if(typeOfTile == 1) //waterTile
+        else if(typeOfTile == 2) //grassTile
         {
             Vector3 worldCoords = GridToWorldCoords(x, selectedTile.y + 1f, z);
-            grid[x, z, y] = new WaterTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(waterTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer, waterTileMat);
+            grid[x, z, y] = new GrassTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(grassTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
         }
     }
 
@@ -180,7 +196,7 @@ public class HexGrid
             grid[x, z, y].deleteInstance();
             grid[x, z, y] = null;
             selectedTile = new Vector3(x, 0, z);
-            GetTile(selectedTile).getGameObject().GetComponent<MeshRenderer>().material = highlightMat;
+            GetTile(selectedTile).getGameObject().GetComponent<MeshRenderer>().material.SetInteger("_Selected", 1);
         }
     }
 }

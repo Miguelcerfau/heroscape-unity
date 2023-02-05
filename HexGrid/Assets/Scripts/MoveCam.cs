@@ -13,7 +13,7 @@ public class MoveCam : MonoBehaviour
     void Start()
     {
         speed = 2f;
-        rotationSpeed = 4f;
+        rotationSpeed = 10f;
         rotationX = transform.eulerAngles.x;
         rotationY = transform.eulerAngles.y;
     }

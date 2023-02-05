@@ -655,15 +655,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6016935b00cd8344683e59508f5a3f86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridTileMat: {fileID: 2100000, guid: 03e013f2a7960c64f880ba4def80326d, type: 2}
-  highlightMat: {fileID: 2100000, guid: 0645fe0a15689b8479f63ca73d7d55ad, type: 2}
-  waterTileMat: {fileID: 2100000, guid: 68621c45b80b13c4d88f5abe044df2fe, type: 2}
+  gridTile: {fileID: 4362045002939240270, guid: 2dcfde0d3e486fe44af97364c89a9591, type: 3}
+  waterTile: {fileID: 1151199096502529920, guid: 3f25e1ea9bd89f24ba7cf8b4844b12af, type: 3}
+  grassTile: {fileID: 4408488860139143395, guid: ba162a72d43bda948953867c12753c4b, type: 3}
   gridContainer: {fileID: 327377282}
   x: 20
   y: 20
   z: 4
-  gridTile: {fileID: 4362045002939240270, guid: 2dcfde0d3e486fe44af97364c89a9591, type: 3}
-  waterTile: {fileID: 800179396551175423, guid: f30804bb215792d418d1136fa260fb60, type: 3}
   mask:
     serializedVersion: 2
     m_Bits: 64

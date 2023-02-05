@@ -10,13 +10,13 @@ public class Tile
     private protected GameObject tile;
     private protected Material mat;
 
-    public Tile(Vector3 worldCoords, Vector3Int gridCoords, GameObject gridContainer, GameObject tile, Material mat)
+    public Tile(Vector3 worldCoords, Vector3Int gridCoords, GameObject gridContainer, GameObject tile)
     {
         this.worldCoords = worldCoords;
         this.gridCoords = gridCoords;
         this.gridContainer = gridContainer;
         this.tile = tile;
-        this.mat = mat;
+        this.mat = tile.GetComponent<MeshRenderer>().material;
     }
 
 
