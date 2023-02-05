@@ -656,7 +656,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridTile: {fileID: 4362045002939240270, guid: 2dcfde0d3e486fe44af97364c89a9591, type: 3}
-  waterTile: {fileID: 1151199096502529920, guid: 3f25e1ea9bd89f24ba7cf8b4844b12af, type: 3}
+  waterTile: {fileID: 6441442033896234174, guid: 66fec7111fd95584f85cb957a77f5a32, type: 3}
+  waterTile75: {fileID: 1151199096502529920, guid: 3f25e1ea9bd89f24ba7cf8b4844b12af, type: 3}
   grassTile: {fileID: 4408488860139143395, guid: ba162a72d43bda948953867c12753c4b, type: 3}
   gridContainer: {fileID: 327377282}
   x: 40

@@ -9,6 +9,8 @@ public class MapCreator : MonoBehaviour
     [SerializeField]
     private GameObject waterTile;
     [SerializeField]
+    private GameObject waterTile75;
+    [SerializeField]
     private GameObject grassTile;
 
 
@@ -32,15 +34,15 @@ public class MapCreator : MonoBehaviour
     void Start()
     {
         typeOfSelectedTile = 1;
-        grid = new HexGrid(x, y, z, new Vector3(0, 0, 0), gridTile, waterTile, grassTile, gridContainer, mask);
+        grid = new HexGrid(x, y, z, new Vector3(0, 0, 0), gridTile, waterTile75, waterTile, grassTile, gridContainer, mask);
     }
 
     // Update is called once per frame
     void Update()
     {
         grid.SelectTile();
-        if(Input.GetMouseButton(0)) grid.insertTile(typeOfSelectedTile);
-        if(Input.GetMouseButton(1)) grid.deleteTile();
+        if(Input.GetMouseButtonDown(0)) grid.insertTile(typeOfSelectedTile);
+        if(Input.GetMouseButtonDown(1)) grid.deleteTile();
         if(Input.GetKeyDown(KeyCode.Alpha1)) typeOfSelectedTile = 1;
         if(Input.GetKeyDown(KeyCode.Alpha2)) typeOfSelectedTile = 2;
     }

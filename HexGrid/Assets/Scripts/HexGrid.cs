@@ -18,6 +18,7 @@ public class HexGrid
     
     private GameObject gridTilePrefab;
     private GameObject waterTilePrefab;
+    private GameObject waterTile75Prefab;
     private GameObject grassTilePrefab;
 
 
@@ -26,7 +27,7 @@ public class HexGrid
     private const float NORMAL75_HEX_SIZE_Y = 0.375f;
 
 
-    public HexGrid(int x, int z, int height, Vector3 gridOrigin, GameObject gridTilePrefab, GameObject waterTilePrefab, GameObject grassTilePrefab, GameObject gridContainer, LayerMask mask)
+    public HexGrid(int x, int z, int height, Vector3 gridOrigin, GameObject gridTilePrefab, GameObject waterTile75Prefab, GameObject waterTilePrefab, GameObject grassTilePrefab, GameObject gridContainer, LayerMask mask)
     {
         this.width = x;
         this.length = z;
@@ -40,6 +41,7 @@ public class HexGrid
         this.gridContainer = gridContainer;
         this.waterTilePrefab = waterTilePrefab;
         this.grassTilePrefab = grassTilePrefab;
+        this.waterTile75Prefab = waterTile75Prefab;
 
         grid = new Tile[x][][];
         for(int i = 0; i < x; ++i)
@@ -191,7 +193,7 @@ public class HexGrid
         if (typeOfTile == 1) //waterTile
         {
             Vector3 worldCoords = GridToWorldCoords(x, centerToTop + NORMAL75_HEX_SIZE_Y, z);
-            grid[x][z][y] = new WaterTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(waterTilePrefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
+            grid[x][z][y] = new WaterTile(worldCoords, new Vector3Int(x, y, z), GameObject.Instantiate(waterTile75Prefab, worldCoords, Quaternion.identity, gridContainer.transform), gridContainer);
         }
         else if(typeOfTile == 2) //grassTile
         {
