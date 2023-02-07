@@ -6,7 +6,7 @@ public class WaterTile : Tile
 {
 
 
-    public WaterTile(Vector3 worldCoords, Vector3Int gridCoords, GameObject waterTile, GameObject gridContainer) : base(worldCoords, gridCoords, gridContainer, waterTile)
+    public WaterTile(Vector3 worldCoords, Vector3Int gridCoords, GameObject waterTile) : base(worldCoords, gridCoords, waterTile)
     {
     }
 }

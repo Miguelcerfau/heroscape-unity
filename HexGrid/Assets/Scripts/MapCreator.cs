@@ -45,5 +45,8 @@ public class MapCreator : MonoBehaviour
         if(Input.GetMouseButtonDown(1)) grid.deleteTile();
         if(Input.GetKeyDown(KeyCode.Alpha1)) typeOfSelectedTile = 1;
         if(Input.GetKeyDown(KeyCode.Alpha2)) typeOfSelectedTile = 2;
+        if(Input.GetKeyDown(KeyCode.Alpha3)) typeOfSelectedTile = 3;
+        if(Input.GetKeyDown(KeyCode.Alpha4)) typeOfSelectedTile = 4;
+        if(Input.GetKeyDown(KeyCode.Alpha5)) typeOfSelectedTile = 5;
     }
 }
