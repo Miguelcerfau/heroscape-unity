@@ -40,7 +40,7 @@ public class MapCreator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        grid.SelectTile();
+        grid.SelectTile(typeOfSelectedTile);
         if(Input.GetMouseButtonDown(0)) grid.insertTile(typeOfSelectedTile);
         if(Input.GetMouseButtonDown(1)) grid.deleteTile();
         if(Input.GetKeyDown(KeyCode.Alpha1)) typeOfSelectedTile = 1;
@@ -48,5 +48,6 @@ public class MapCreator : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Alpha3)) typeOfSelectedTile = 3;
         if(Input.GetKeyDown(KeyCode.Alpha4)) typeOfSelectedTile = 4;
         if(Input.GetKeyDown(KeyCode.Alpha5)) typeOfSelectedTile = 5;
+        if(Input.GetKeyDown(KeyCode.Alpha6)) typeOfSelectedTile = 6; //circle
     }
 }

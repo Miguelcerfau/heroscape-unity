@@ -2,8 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+
 public class HexGrid
 {
+    public static Vector3[] evenAdjacentsXZ = {
+                                            new Vector3(1f, 0f, 0f),
+                                            new Vector3(0f, 0f, 1f),
+                                            new Vector3(-1f, 0f, 1f),
+                                            new Vector3(-1f, 0f, 0f),
+                                            new Vector3(-1f, 0f, -1f),
+                                            new Vector3(0f, 0f, -1f)
+                                           };
+
+    public static Vector3[] oddAdjacentsXZ = {
+                                            new Vector3(1f, 0f, 0f),
+                                            new Vector3(1f, 0f, 1f),
+                                            new Vector3(0f, 0f, 1f),
+                                            new Vector3(-1f, 0f, 0f),
+                                            new Vector3(0f, 0f, -1f),
+                                            new Vector3(1f, 0f, -1f)
+                                           };
+
     private int width;
     private int length;
     private int height;
@@ -12,6 +33,7 @@ public class HexGrid
     private Vector3 gridOrigin;
     private Tile[][][] grid;
     private Vector3 selectedTile;
+    private List<Vector3> auxiliarSelectedTiles;
     private LayerMask mask;
     private GameObject gridContainer;
     
@@ -42,6 +64,7 @@ public class HexGrid
         this.waterTilePrefab = waterTilePrefab;
         this.grassTilePrefab = grassTilePrefab;
         this.waterTile75Prefab = waterTile75Prefab;
+        auxiliarSelectedTiles = new List<Vector3>();
 
         grid = new Tile[x][][];
         for(int i = 0; i < x; ++i)
@@ -75,7 +98,7 @@ public class HexGrid
         return selectedTile;
     }
 
-    public void SelectTile()
+    public void SelectTile(int typeOfSelectedTile)
     {
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = 100f;
@@ -84,41 +107,73 @@ public class HexGrid
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100, mask))
+        if (Physics.Raycast(ray, out hit, 100, mask)) //if pointed by mouse do the selection
         {
             Vector3 posLastSelectedTile = GetPosSelectedTile();
-
             Vector3 posActualTile = WorldToGridCoords(hit.transform.position);
 
-            if (posLastSelectedTile != posActualTile)
+            if (posLastSelectedTile != posActualTile && posLastSelectedTile != new Vector3(-1, -1, -1))
             {
-                if(posLastSelectedTile != new Vector3(-1, -1, -1))
-                {
-                    GameObject lastSelectedTile = GetTile(posLastSelectedTile).getGameObject();
-                    lastSelectedTile.GetComponent<MeshRenderer>().material.SetInteger("_Selected", 0);
-                }
-                    
-                //Debug.Log(lastSelectedTile.transform.position);
-                selectedTile = posActualTile;
+                unselectTiles(posLastSelectedTile);            
             }
+            selectedTile = posActualTile;
+            selectMoreTiles(typeOfSelectedTile);
             GetTile(posActualTile).getGameObject().GetComponent<MeshRenderer>().material.SetInteger("_Selected", 1);
-            //Debug.Log(hit.transform.position);
         }
-        else
+        else //not selected, then the selected tile becomes -1,-1,-1
         {
-            if (selectedTile != new Vector3(-1, -1, -1))
-            {
-                GameObject lastSelectedTile = GetTile(selectedTile).getGameObject();
-                lastSelectedTile.GetComponent<MeshRenderer>().material.SetInteger("_Selected", 0);
-            }
+            if (selectedTile != new Vector3(-1, -1, -1)) unselectTiles(selectedTile);
             selectedTile = new Vector3(-1, -1, -1);
 
         }
     }
+    private void unselectTiles(Vector3 posLastSelectedTile)
+    {
+        GameObject lastSelectedTile = GetTile(posLastSelectedTile).getGameObject();
+        lastSelectedTile.GetComponent<MeshRenderer>().material.SetInteger("_Selected", 0);
+        for (int i = auxiliarSelectedTiles.Count - 1; i >= 0; --i)
+        {
+            GetTile(auxiliarSelectedTiles[i]).getGameObject().GetComponent<MeshRenderer>().material.SetInteger("_Selected", 0);
+            auxiliarSelectedTiles.RemoveAt(i);
+        }
+    }
+
+
+    private void selectMoreTiles(int typeOfSelectedTile)
+    {
+        switch (typeOfSelectedTile)
+        {
+            case 6: //Circle rad 1
+                for (int i = 0; i < 6; ++i)
+                {
+                    Vector3 aux = (selectedTile.z % 2) != 0 ? selectedTile + oddAdjacentsXZ[i] : selectedTile + evenAdjacentsXZ[i];
+                    if (tileIsCorrect(aux) && !tileFloating(aux))
+                    {
+                        auxiliarSelectedTiles.Add(aux);
+                        GetTile(aux).getGameObject().GetComponent<MeshRenderer>().material.SetInteger("_Selected", 1);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private bool tileFloating(Vector3 tile)
+    {
+        return heightOfXZ(new Vector2(tile.x,tile.z)) != tile.y;
+    }
+
+
+    private bool tileIsCorrect(Vector3 tile)
+    {
+        return tile.x < width && tile.y < height && tile.z < length && tile.x >= 0 && tile.y >= 0 && tile.z >= 0;
+    }
 
     public Tile GetTile(Vector3 positionTile)
     {
-        return grid[Mathf.RoundToInt(positionTile.x)][Mathf.RoundToInt(positionTile.z)][Mathf.RoundToInt(positionTile.y)];
+        Tile t = grid[Mathf.RoundToInt(positionTile.x)][Mathf.RoundToInt(positionTile.z)][Mathf.RoundToInt(positionTile.y)];
+        return t;
     }
 
     public Vector3 WorldToGridCoords(Vector3 positionWorldSpace)
@@ -163,7 +218,7 @@ public class HexGrid
             if (x != null) res += 1f;
             else break;
         }
-        return res - 1; //-1 because there's always a tile (gridTile)
+        return res - 1f; //-1 because there's always a tile (gridTile)
     }
 
 
@@ -220,10 +275,15 @@ public class HexGrid
                 tileBlue.getGameObject().GetComponent<MeshRenderer>().material.SetInteger("_isStart", 2);
                 tileBlue.setStartTile(2);
                 break;
-            case 5:
+            
+            case 5: //deleteTeamTile
                 Tile tileNoTeam = GetTile(selectedTile);
                 tileNoTeam.getGameObject().GetComponent<MeshRenderer>().material.SetInteger("_isStart", 0);
                 tileNoTeam.setStartTile(0);
+                break;
+
+            case 6: //adjacentGrass
+
                 break;
         }
     }
