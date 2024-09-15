@@ -5,46 +5,49 @@ using UnityEngine;
 public class MapCreator : MonoBehaviour
 {
     [SerializeField]
-    private GameObject hexPrefab;
+    private GameObject gridTile;
+    [SerializeField]
+    private GameObject waterTile;
+    [SerializeField]
+    private GameObject waterTile75;
+    [SerializeField]
+    private GameObject grassTile;
 
-    private HexGrid grid;
-    
+
+
     [SerializeField]
     private GameObject gridContainer;
+    [SerializeField]
+    private int x;
+    [SerializeField]
+    private int y;
+    [SerializeField]
+    private int z;
 
+
+
+    private int typeOfSelectedTile; //0 grid, 1 water, 2 grass
+    private HexGrid grid;
     public LayerMask mask;
 
     // Start is called before the first frame update
     void Start()
     {
-        int x = 20;
-        int z = 20;
-        grid = new HexGrid(x, z, 4, new Vector3(0, 0, 0), hexPrefab, gridContainer);
+        typeOfSelectedTile = 1;
+        grid = new HexGrid(x, y, z, new Vector3(0, 0, 0), gridTile, waterTile75, waterTile, grassTile, gridContainer, mask);
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = 100f;
-        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
-        Debug.DrawRay(Camera.main.transform.position, mousePos - Camera.main.transform.position, Color.blue);
-
-        Vector3 posLastSelectedTile = grid.GetPosSelectedTile();
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if(Physics.Raycast(ray, out hit, 100, mask))
-        {
-            Vector3 posActualTile = grid.WorldToGridCoords(hit.transform.position);
-            if (posLastSelectedTile != posActualTile)
-            {
-                GameObject lastSelectedTile = grid.GetTile(posLastSelectedTile);
-                if(lastSelectedTile.transform.position.y != 0) lastSelectedTile.transform.Translate(new Vector3(0, -1, 0));
-                grid.SelectTile(posActualTile);
-                grid.GetTile(posActualTile).transform.Translate(new Vector3(0, 1, 0));
-            }
-            Debug.Log(hit.transform.position);
-        }
-        
+        grid.SelectTile(typeOfSelectedTile);
+        if(Input.GetMouseButtonDown(0)) grid.insertTile(typeOfSelectedTile);
+        if(Input.GetMouseButtonDown(1)) grid.deleteTile();
+        if(Input.GetKeyDown(KeyCode.Alpha1)) typeOfSelectedTile = 1;
+        if(Input.GetKeyDown(KeyCode.Alpha2)) typeOfSelectedTile = 2;
+        if(Input.GetKeyDown(KeyCode.Alpha3)) typeOfSelectedTile = 3;
+        if(Input.GetKeyDown(KeyCode.Alpha4)) typeOfSelectedTile = 4;
+        if(Input.GetKeyDown(KeyCode.Alpha5)) typeOfSelectedTile = 5;
+        if(Input.GetKeyDown(KeyCode.Alpha6)) typeOfSelectedTile = 6; //circle
     }
 }
